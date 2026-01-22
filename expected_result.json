@@ -1,0 +1,26 @@
+{
+  "status": "fix_success",
+  "data": {
+    "id": "auto_generate",
+    "username": "request_username",
+    "email": "request_email",
+    "role": "request_role",
+    "created_at": "auto_generate",
+    "profile": {
+      "full_name": "request_profile.full_name",
+      "age": "request_profile.age",
+      "city": "request_profile.city",
+      "test": {
+        "age": "request_profile.test.age"
+      },
+      "language": [
+        "request_profile.language[0]",
+        "request_profile.language[1]"
+      ],
+        "friends": [
+           {"name" : "request_profile.friends[0].name", "age" : "request_profile.friends[0].age"}, 
+           {"name": "request_profile.friends[1].name", "age": "request_profile.friends[1].age"}
+        ]
+    }
+  }
+}

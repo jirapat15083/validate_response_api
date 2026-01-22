@@ -1,0 +1,15 @@
+{
+    "username": "alice_dev",
+    "email": "alice@example.com",
+    "role": "admin",
+    "profile": {
+        "full_name": "Alice Wonderland",
+        "age": 25,
+        "city": "Bangkok",
+        "test": {
+          "age" : "999"
+        },
+        "language": ["en","th"],
+        "friends":[{"name" : "Bob", "age" : 30}, {"name": "Charlit", "age":30}]
+    }
+}
