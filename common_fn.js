@@ -2,31 +2,39 @@ import expected from './expected_result.json' with { type: 'json' };
 import request from './request.json' with { type: 'json' };
 import response from './response.json' with { type: 'json' };
 
-function validate_response(expected_result, response_api, response_db, request_from_api) {
+function validate_response(expected_result, response_api, response_db, request_from_api, logger = () => {}) {
     
-    console.log('Begin Validate...');
+    logger('Begin Validate...');
     const errors = [];
 
-    validateObject(expected_result, response_api, request_from_api, errors);
+    validateObject(expected_result, response_api, request_from_api, errors, '', logger);
 
     if (errors.length > 0) {
-        console.log('Validation Failed');
-        console.table(errors);
+        logger('Validation Failed');
+        errors.forEach(err => {
+        logger(
+            `❌ ${err.path} | expected: ${err.expected} | actual: ${err.actual}`
+        );
+        });
     } else {
-        console.log('Validation Succeeded');
+        logger('Validation Succeeded');
     }
+
+     return errors;
 }
 
-function validateObject(expectedObj, responseObj, requestObj, errorList, basePath = '') {
+function validateObject(expectedObj, responseObj, requestObj, errorList, basePath = '', logger) {
     for (const key in expectedObj) {
         const expectedValue = expectedObj[key];  // ค่าใน path expected
         const responseValue = responseObj?.[key]; // ค่าใน response
         const currentPath = basePath ? `${basePath}.${key}` : key; // path ปัจจุบัน default เป็นว่าง ถ้า รันรอบแรกจะเป็น key เลย
+
+        logger(`🔍 Checking: ${currentPath}`);
         // console.log('expectedValue', expectedValue, 'key', key, 'typeof', typeof expectedValue)
 
         /* ================= OBJECT ================= */
         if (typeof expectedValue === 'object' && expectedValue !== null) {
-            validateObject(expectedValue, responseValue, requestObj, errorList, currentPath); //ถ้าเป็น path object แล้วไม่มีค่า expected value จะไป key ข้างใน พร้อมกับทำ validateObject
+            validateObject(expectedValue, responseValue, requestObj, errorList, currentPath, logger); //ถ้าเป็น path object แล้วไม่มีค่า expected value จะไป key ข้างใน พร้อมกับทำ validateObject
             continue;
         }
 
@@ -37,15 +45,21 @@ function validateObject(expectedObj, responseObj, requestObj, errorList, basePat
             // console.log('resolved', resolved)
             const actual = responseValue;
 
-            if (resolved === undefined) continue;
+            if (resolved === undefined){
+                logger(`⏭️  Skip: ${currentPath}`);
+                 continue;
+            }
 
             // primitive
             if (String(actual) !== String(resolved)) {
+                logger(`❌ Mismatch: ${currentPath}`);
                 errorList.push({
                     path: currentPath,
                     expected: resolved,
                     actual
                 });
+            }else{
+                 logger(`✅ Match: ${currentPath}`);
             }
         }
     }
